@@ -13,6 +13,8 @@ import { UserModule } from './modules/user/user.module';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { Category } from './entities/category.entity';
+import { DocumentCategory } from './entities/document-category.entity';
+import { Document } from './entities/document.entity';
 import { CategoryModule } from './modules/category/category.module';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
@@ -24,6 +26,7 @@ import {VideoWatch} from './entities/video-watch.entity'
 import {AuthModule} from './auth/auth.module';
 import {TicketModule} from './modules/tickets/tickets.module'
 import {ReportsModule} from './modules/reports/reports.module'
+import { DocumentModule } from './modules/document/document.module';
 // import { WebsiteMeta } from './entities/website-meta.entity'
 // import { SiteModule } from './modules/site/site.module'
 @Module({
@@ -35,7 +38,7 @@ import {ReportsModule} from './modules/reports/reports.module'
       username: 'root',
       password: '',
       database: 'corekhoahoc',
-      entities: [Product, Course, Video, Enrollment, User, Category,Ticket,TicketMessage,VideoWatch],
+      entities: [Product, Course, Video, Enrollment, User, Category, Ticket, TicketMessage, VideoWatch, DocumentCategory, Document],
       synchronize: true,
     }),
     ProductModule,
@@ -47,6 +50,7 @@ import {ReportsModule} from './modules/reports/reports.module'
     AuthModule, // 👈 chỉ giữ cái này
     TicketModule,
     ReportsModule,
+    DocumentModule,
     // SiteModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),

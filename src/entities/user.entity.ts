@@ -38,6 +38,12 @@ export class User extends BaseEntity {
     @Column({ nullable: true })
     utm_source: string; // Nguồn UTMs
 
+    @Column({ nullable: true })
+    resetToken: string; // Token để reset mật khẩu
+
+    @Column({ nullable: true })
+    resetTokenExpiry: Date; // Thời gian hết hạn của token
+
     @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
 
