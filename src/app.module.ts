@@ -13,6 +13,8 @@ import { UserModule } from './modules/user/user.module';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { Category } from './entities/category.entity';
+import { DocumentCategory } from './entities/document-category.entity';
+import { Document } from './entities/document.entity';
 import { CategoryModule } from './modules/category/category.module';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
@@ -24,31 +26,43 @@ import {VideoWatch} from './entities/video-watch.entity'
 import {AuthModule} from './auth/auth.module';
 import {TicketModule} from './modules/tickets/tickets.module'
 import {ReportsModule} from './modules/reports/reports.module'
+import { DocumentModule } from './modules/document/document.module';
 // import { WebsiteMeta } from './entities/website-meta.entity'
 // import { SiteModule } from './modules/site/site.module'
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-  type: 'mysql',
-  host: 'localhost',
-  port: 3306,
-  username: 'coreuser',       // <-- dùng user đã tạo
-  password: 'StrongPassword123',  // <-- password đúng
-  database: 'corekhoahoc',
-  entities: [Product, Course, Video, Enrollment, User, Category, Ticket, TicketMessage, VideoWatch],
-synchronize: false
-}),
-
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'coreuser',
+      password: 'StrongPassword123',
+      database: 'corekhoahoc',
+      entities: [
+        Product,
+        Course,
+        Video,
+        Enrollment,
+        User,
+        Category,
+        Ticket,
+        TicketMessage,
+        VideoWatch,
+        DocumentCategory,
+        Document,
+      ],
+      synchronize: true, // hoặc false nếu prod
+    }),
     ProductModule,
-    CourcetModule,
+    CourcetModule, // sửa chính tả
     VideoModule,
     EnrollmentsModule,
     UserModule,
     CategoryModule,
-    AuthModule, // 👈 chỉ giữ cái này
+    AuthModule,
     TicketModule,
     ReportsModule,
-    // SiteModule,
+    DocumentModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
@@ -57,4 +71,5 @@ synchronize: false
   ],
 })
 export class AppModule {}
+
 
