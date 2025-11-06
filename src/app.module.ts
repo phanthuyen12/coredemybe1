@@ -35,23 +35,34 @@ import { DocumentModule } from './modules/document/document.module';
       type: 'mysql',
       host: 'localhost',
       port: 3306,
-      username: 'root',
-      password: '',
+      username: 'coreuser',
+      password: 'StrongPassword123',
       database: 'corekhoahoc',
-      entities: [Product, Course, Video, Enrollment, User, Category, Ticket, TicketMessage, VideoWatch, DocumentCategory, Document],
-      synchronize: true,
+      entities: [
+        Product,
+        Course,
+        Video,
+        Enrollment,
+        User,
+        Category,
+        Ticket,
+        TicketMessage,
+        VideoWatch,
+        DocumentCategory,
+        Document,
+      ],
+      synchronize: true, // hoặc false nếu prod
     }),
     ProductModule,
-    CourcetModule,
+    CourcetModule, // sửa chính tả
     VideoModule,
     EnrollmentsModule,
     UserModule,
     CategoryModule,
-    AuthModule, // 👈 chỉ giữ cái này
+    AuthModule,
     TicketModule,
     ReportsModule,
     DocumentModule,
-    // SiteModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
@@ -60,4 +71,5 @@ import { DocumentModule } from './modules/document/document.module';
   ],
 })
 export class AppModule {}
+
 
