@@ -29,15 +29,16 @@ import {ReportsModule} from './modules/reports/reports.module'
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: '',
-      database: 'corekhoahoc',
-      entities: [Product, Course, Video, Enrollment, User, Category,Ticket,TicketMessage,VideoWatch],
-      synchronize: true,
-    }),
+  type: 'mysql',
+  host: 'localhost',
+  port: 3306,
+  username: 'coreuser',       // <-- dùng user đã tạo
+  password: 'StrongPassword123',  // <-- password đúng
+  database: 'corekhoahoc',
+  entities: [Product, Course, Video, Enrollment, User, Category, Ticket, TicketMessage, VideoWatch],
+synchronize: false
+}),
+
     ProductModule,
     CourcetModule,
     VideoModule,
