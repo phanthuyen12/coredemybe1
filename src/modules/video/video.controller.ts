@@ -67,8 +67,12 @@ async findWithFilter(
     @Body() videoDto: VideoDto,
     @UploadedFile() file?: Express.Multer.File,
   ): Promise<ResponseData<any>> {
-    // Nếu có upload file thì gán tên file
+    // Kiểm tra file size nếu có file
     if (file) {
+      const maxSize = 500 * 1024 * 1024; // 500MB
+      if (file.size > maxSize) {
+        throw new BadRequestException(`File quá lớn. Kích thước tối đa là 500MB. File hiện tại: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+      }
       videoDto.url = file.filename;
     }
 

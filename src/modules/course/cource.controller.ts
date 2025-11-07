@@ -25,9 +25,32 @@ export class CourceController {
         @Query('page') page: number = 1,
         @Query('limit') limit: number = 10,
         @Query('title') title?: string,
-        @Query('active') active?: boolean,
+        @Query('active') active?: string,
     ): Promise<ResponseData<any>> {
-        const res = await this.courceService.findWithFilter(page, limit, title, active);
+        // Parse page và limit
+        const pageNum = page && !isNaN(Number(page)) ? Number(page) : 1;
+        const limitNum = limit && !isNaN(Number(limit)) ? Number(limit) : 10;
+
+        // Xử lý title: chỉ filter nếu có giá trị và không rỗng
+        const titleFilter = title && title.trim() !== '' ? title.trim() : undefined;
+
+        // Xử lý active: 
+        // - Nếu active rỗng/undefined/null → undefined (KHÔNG filter, lấy cả true và false)
+        // - Nếu active = "true" hoặc "1" → true (chỉ lấy active = 1)
+        // - Nếu active = "false" hoặc "0" → false (chỉ lấy active = 0)
+        let activeFilter: boolean | undefined = undefined;
+        if (active !== undefined && active !== null && active !== '') {
+            const activeStr = active.toString().toLowerCase().trim();
+            if (activeStr === 'true' || activeStr === '1') {
+                activeFilter = true;
+            } else if (activeStr === 'false' || activeStr === '0') {
+                activeFilter = false;
+            }
+            // Nếu không phải true/false/1/0 → giữ undefined (KHÔNG filter, lấy TẤT CẢ)
+        }
+        // Nếu active rỗng hoặc không có → activeFilter = undefined → lấy TẤT CẢ courses
+
+        const res = await this.courceService.findWithFilter(pageNum, limitNum, titleFilter, activeFilter);
         return new ResponseData(res, 200, 'Get filtered cources success');
     }
     @Get()
@@ -77,6 +100,12 @@ export class CourceController {
     const res = await this.courceService.getByIdWithCategoriesAndVideos(id)
         return new ResponseData(res, 200, 'Cource updated successfully'); 
 
+  }
+
+  @Delete('/:id')
+  async delete(@Param('id', ParseIntPipe) id: number): Promise<ResponseData<null>> {
+    await this.courceService.delete(id);
+    return new ResponseData(null, 200, 'Course deleted successfully');
   }
 
 }
