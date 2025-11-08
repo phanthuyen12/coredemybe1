@@ -5,6 +5,7 @@ import { Course } from "../../entities/course.entity";
 import { CourseDto } from "../../dto/cource.dto"; 
 import { faker } from "@faker-js/faker";
 import { Category } from "../../entities/category.entity";
+import { Enrollment } from "../../entities/enrollment.entity";
 import { promises } from "dns";
 
 @Injectable()
@@ -14,6 +15,8 @@ export class CourceService {
     private readonly courseRepository: Repository<Course>,
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
+    @InjectRepository(Enrollment)
+    private readonly enrollmentRepository: Repository<Enrollment>,
   ) {}
 
   async getAll(): Promise<Course[]> {
@@ -92,10 +95,17 @@ export class CourceService {
   }
 
   async delete(id: number): Promise<void> {
-    const result = await this.courseRepository.delete(id);
-    if (result.affected === 0) {
+    // Kiểm tra course có tồn tại không
+    const course = await this.courseRepository.findOne({ where: { id } });
+    if (!course) {
       throw new NotFoundException(`Course with ID ${id} not found`);
     }
+
+    // Xóa tất cả enrollments liên quan đến course này trước
+    await this.enrollmentRepository.delete({ courseId: id });
+
+    // Sau đó mới xóa course
+    await this.courseRepository.delete(id);
     return;
   }
 
@@ -125,17 +135,31 @@ export class CourceService {
     title?: string,
     active?: boolean,
   ): Promise<{ data: Course[]; total: number; page: number; limit: number }> {
-    let query = this.courseRepository.createQueryBuilder('course').leftJoinAndSelect('course.categories', 'category');
+    let query = this.courseRepository
+      .createQueryBuilder('course')
+      .leftJoinAndSelect('course.categories', 'category');
 
-    if (title) {
+    // Filter theo title nếu có
+    if (title && title.trim() !== '') {
       query = query.andWhere('course.title LIKE :title', { title: `%${title}%` });
     }
 
-    if (active !== undefined) {
-      query = query.andWhere('course.active = :active', { active });
+    // Filter theo active: 
+    // - Nếu active = undefined/null → KHÔNG filter (lấy cả true và false)
+    // - Nếu active = true → chỉ lấy active = 1
+    // - Nếu active = false → chỉ lấy active = 0
+    if (active !== undefined && active !== null) {
+      query = query.andWhere('course.active = :active', { active: active ? 1 : 0 });
     }
+    // Nếu active là undefined → không thêm điều kiện → lấy TẤT CẢ (cả active = 1 và active = 0)
 
-    const [data, total] = await query.skip((page - 1) * limit).take(limit).getManyAndCount();
+    // Sắp xếp theo id (mới nhất trước)
+    query = query.orderBy('course.id', 'DESC');
+
+    const [data, total] = await query
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
 
     return { data, total, page, limit };
   }
